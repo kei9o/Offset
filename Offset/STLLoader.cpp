@@ -7,7 +7,7 @@ tmp_point* point_array[3 * MAX_NUM_TRIANGLES];
 unsigned int num_tmp_points;
 
 // 点に接続する辺のリスト．一時的な利用．
-tmp_edge** connectin_edge;
+tmp_edge** connecting_edge;
 
 // 点
 double point[MAX_NUM_POINTS][3];
@@ -19,7 +19,7 @@ unsigned int num_edges;
 
 // 三角形ポリゴンの頂点と周囲の辺
 unsigned int triangle[MAX_NUM_TRIANGLES][3];
-unsigned int triangle[MAX_NUM_TRIANGLES][3];
+unsigned int triangle_edge[MAX_NUM_TRIANGLES][3];
 unsigned int num_triangles;
 
 // アスキーで書かれたSTLファイルの読み込み
@@ -260,4 +260,63 @@ bool loadSTLFile(const char* STL_file)
 	// 以降point_arrayは不要なのでメモリを解放．
 	for (i = 0; i < num_tmp_points; i++)
 		free(point_array[i]);
+
+	// 最後に辺を登録する．
+	num_edges = 0;
+
+	// 各点に接続する辺の記録場所の初期化．
+	connecting_edge = (tmp_edge**)malloc(num_points * sizeof(tmp_edge));
+	for (i = 0; i < num_points; i++)
+		connecting_edge[i] = NULL;
+
+	// 各三角形の周囲の辺と登録済みの辺を比較．
+	for (i = 0; i < num_triangles; i++) {
+		for (j = 0; j < 3; j++) {
+			ed = connecting_edge[triangle[i][j]];
+			while (ed != NULL) {
+
+				// すでに登録済み．
+				if (((ed->start == triangle[i][j])
+					&& (ed->end == triangle[i][(j + 1) % 3]))
+					|| ((ed->start == triangle[i][(j + 1) % 3])
+						&& (ed->end == triangle[i][j])))
+					goto try_next;
+			}
+
+			// 未登録の辺が見つかったので新たに登録．
+			edge[num_edges][0] = triangle[i][j];
+			edge[num_edges][1] = triangle[i][(j + 1) % 3];
+
+			// 辺を三角形にも記録．
+			triangle_edge[i][j] = num_edges;
+			num_edges++;
+
+			// 同時に点も記録しておく．
+			new_ed = (tmp_edge*)malloc(sizeof(tmp_edge));
+			new_ed->start = triangle[i][j];
+			new_ed->end = triangle[i][(j + 1) % 3];
+			new_ed->next = connecting_edge[triangle[i][j]];
+			connecting_edge[triangle[i][j]] = new_ed;
+			new_ed = (tmp_edge*)malloc(sizeof(tmp_edge));
+			new_ed->start = triangle[i][(j + 1) % 3];
+			new_ed->end = triangle[i][j];
+			new_ed->next = connecting_edge[triangle[i][(j + 1) % 3]];
+			connecting_edge[triangle[i][(j + 1) % 3]] = new_ed;
+		try_next:;
+		}
+	}
+
+	// 以降connecting_edgeは不要なのでメモリを解放．
+	for (i = 0; i < num_points; i++) {
+		ed = connecting_edge[i];
+		while (ed != NULL) {
+			next_ed = ed->next;
+			free(ed);
+			ed = next_ed;
+		}
+	}
+	free(connecting_edge);
+	std::cout << "Edges: " << num_edges << " ";
+	std::cout << "Point: " << num_points << std::endl;
+	return(true);
 }
