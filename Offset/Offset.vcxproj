@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BasicGeom.cpp" />
     <ClCompile Include="Offset.cpp" />
     <ClCompile Include="STLLoader.cpp" />
   </ItemGroup>
