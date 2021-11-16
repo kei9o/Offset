@@ -195,3 +195,69 @@ void quickSort(int l, int r, tmp_point* point[])
 		quickSort(j + 1, r, point);
 	}
 }
+
+// STLファイルのロード．
+bool loadSTLFile(const char* STL_file)
+// const char* STL_file; STLファイルの名前
+{
+	unsigned int i, j, start, end;
+	unsigned int tri_index, ver_index;
+	double ref_pnt[3] = { LARGE, LARGE, LARGE };
+	tmp_edge* ed, * new_ed, * next_ed;
+
+	// アスキーファイルの読み込み．一時的にpoint_arrayに格納される．
+	if (readASCIISTLFile(STL_file))
+		std::cout << "Triangles: " << num_triangles << " ";
+
+	// バイナリーファイルの読み込み．一時的にpoint_arrayに格納される．
+	else if (readBinarySTLFile(STL_file))
+		std::cout << "Triangles: " << num_triangles << " ";
+
+	// 読み込み失敗
+	else {
+		std::cout << "Cannot open file. ";
+		return(false);
+	}
+
+	// 得られた点群をソートし同じ座標の点を一つにまとめる
+	quickSort(0, num_tmp_points - 1, point_array);
+
+	// ソート済みの点列を先頭からスキャン．
+	num_points = 0;
+	for (i = 0; i <= num_tmp_points; i++) {
+
+		// 最後の点が参照テントは異なる点が見つかった．
+		if ((i == num_tmp_points)
+			|| (fabs(ref_pnt[X] - (point_array[i]->coord[X])) > (EPS))
+			|| (fabs(ref_pnt[Y] - (point_array[i]->coord[Y])) > (EPS))
+			|| (fabs(ref_pnt[Z] - (point_array[i]->coord[Z])) > (EPS))) {
+
+			// 同一座標の点が複数見つかっているはず．それらを同じ点として登録しなおす．
+			end = i;
+			if (i > 0) {
+				// 最初だけ無視する．
+				point[num_points][X] = ref_pnt[X];
+				point[num_points][Y] = ref_pnt[Y];
+				point[num_points][Z] = ref_pnt[Z];
+				for (j = start; j < end; j++) {
+					tri_index = point_array[j]->index / 3;
+					ver_index = point_array[j]->index % 3;
+					triangle[tri_index][ver_index] = num_points;
+				}
+				num_points++;
+			}
+
+			// 必要なら参照点を更新する．
+			if (end < num_tmp_points) {
+				ref_pnt[X] = point_array[end]->coord[X];
+				ref_pnt[Y] = point_array[end]->coord[Y];
+				ref_pnt[Z] = point_array[end]->coord[Z];
+				start = end;
+			}
+		}
+	}
+
+	// 以降point_arrayは不要なのでメモリを解放．
+	for (i = 0; i < num_tmp_points; i++)
+		free(point_array[i]);
+}
