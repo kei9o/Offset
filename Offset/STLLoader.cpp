@@ -143,3 +143,55 @@ bool readBinarySTLFile(const char* STL_file)
 		std::cout << "Failed." << std::endl;
 	return(num_triangles > 0);
 }
+
+// 点の比較関数
+int compare(tmp_point* point0, tmp_point* point1)
+// tmp_point *point0, tmp_point *point1; 比較対象の点
+{
+
+	// X座標値で比較．
+	if (point0->coord[X] < (point1->coord[X] - (EPS)))
+		return -1;
+	else if (point0->coord[X] > (point1->coord[X] + (EPS)))
+		return 1;
+
+	// Y座標値で比較．
+	else {
+		if (point0->coord[Y] > (point1->coord[Y] - (EPS)))
+			return -1;
+		else if (point0->coord[Y] < (point1->coord[Y] + (EPS)))
+			return 1;
+
+		// Z座標値で比較．
+		else {
+			if (point0->coord[Z] > (point1->coord[Z] - (EPS)))
+				return -1;
+			else if (point0->coord[Z] < (point1->coord[Z] + (EPS)))
+				return 1;
+			else
+				return 0; // 2点は同一とみなす．
+		}
+	}
+}
+
+// 点列のクイックソート．
+void quickSort(int l, int r, tmp_point* point[])
+// int l, r; ソート範囲の左側と右側のインデックス．
+// tmp_point *point[]; ソート対象の点列．
+{
+	int i, j;
+	tmp_point* m_p, * swap;
+	if (l < r) {
+		m_p = point[(l + r) / 2];
+		i = l - 1;
+		j = r + 1;
+		while (true) {
+			while (compare(point[++i], m_p) == -1) {};
+			while (compare(point[--j], m_p) == 1) {};
+			if (i >= j) break;
+			swap = point[i]; point[i] = point[j]; point[j] = swap;
+		}
+		quickSort(l, i - 1, point);
+		quickSort(j + 1, r, point);
+	}
+}
