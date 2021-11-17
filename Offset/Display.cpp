@@ -15,10 +15,6 @@ double x_axis[3], y_axis[3], z_axis[3]; // ‹“_À•WŒnÀ•W²‚ÌƒOƒ[ƒoƒ‹À•WŒn‚É‚
 double corner[3];
 double pixel_size, ref_far, ref_near;
 
-// •ûˆÊŠp‚Æ‹ÂŠp
-double phi = 30.0;
-double theta = 30.0;
-
 // Æ–¾
 GLfloat light_pos[4];
 
@@ -29,7 +25,7 @@ extern unsigned int num_points;
 
 // OŠpŒ`ƒ|ƒŠƒSƒ“
 extern unsigned int triangle[MAX_NUM_TRIANGLES][3];
-extern unsigned int num_triangle;
+extern unsigned int num_triangles;
 
 // Šî–{“I‚È}Œ`ŒvZD
 extern double dot(double vec0[], double vec1[]);
@@ -46,7 +42,7 @@ void defineViewMatrix(double phi, double theta, unsigned int width, unsigned int
 	unsigned int i, j;
 	double c, s, xy_dist;
 	double x_axis[3], y_axis[3], z_axis[3], vec[3];
-	double left, right, bottom, top, farVal, nearVal, margin;
+	double left, right, bottom, top, farVal, nearVal;
 	double dx, dy, d_aspect, w_aspect, d;
 
 	// ‹“_‚Ìİ’è

@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <bits/stdc++.h>
 
 #include "BasicDef.h"
@@ -31,10 +32,11 @@ bool readASCIISTLFile(const char* STL_file)
 	char line[100];
 	static char dummy[100];
 	FILE* in;
+	errno_t error;
 	tmp_point* tmp_pnt;
 
 	// STLファイルのオープン
-	in = fopen(STL_file, "r");
+	error = fopen_s(&in, STL_file, "r");
 	if (in == NULL) 
 		return false;
 
@@ -49,7 +51,7 @@ bool readASCIISTLFile(const char* STL_file)
 			continue;
 
 		// 連続する3頂点を読み込みポリゴンを登録．
-		sscanf(line, "%s %lf %lf %lf", dummy, &x, &y, &z); // TODO forで回せる？
+		(void)sscanf(line, "%s %lf %lf %lf", dummy, &x, &y, &z); // TODO forで回せる？
 		tmp_pnt = (tmp_point*)malloc(sizeof(tmp_point));
 		point_array[num_tmp_points] = tmp_pnt;
 		tmp_pnt->coord[X] = x;
@@ -59,7 +61,7 @@ bool readASCIISTLFile(const char* STL_file)
 		num_tmp_points++;
 
 		fgets(line, 100, in);
-		sscanf(line, "%s %lf %lf %lf", dummy, &x, &y, &z);
+		(void)sscanf(line, "%s %lf %lf %lf", dummy, &x, &y, &z);
 		tmp_pnt = (tmp_point*)malloc(sizeof(tmp_point));
 		point_array[num_tmp_points] = tmp_pnt;
 		tmp_pnt->coord[X] = x;
@@ -69,7 +71,7 @@ bool readASCIISTLFile(const char* STL_file)
 		num_tmp_points++;
 
 		fgets(line, 100, in);
-		sscanf(line, "%s %lf %lf %lf", dummy, &x, &y, &z);
+		(void)sscanf(line, "%s %lf %lf %lf", dummy, &x, &y, &z);
 		tmp_pnt = (tmp_point*)malloc(sizeof(tmp_point));
 		point_array[num_tmp_points] = tmp_pnt;
 		tmp_pnt->coord[X] = x;
@@ -94,11 +96,12 @@ bool readBinarySTLFile(const char* STL_file)
 {
 	char line[85];
 	FILE* in;
+	errno_t error;
 	float* coord;
 	tmp_point* tmp_pnt;
 
 	// STLファイルのオープン．
-	in = fopen(STL_file, "rb");
+	error = fopen_s(&in, STL_file, "rb");
 	if (in == NULL)
 		return false;
 
