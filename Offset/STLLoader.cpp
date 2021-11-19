@@ -180,12 +180,6 @@ int compare(tmp_point* point0, tmp_point* point1)
 	}
 }
 
-// std::sort用double変数比較関数
-static bool IsGreater(double u, double v)
-{
-	return u > v;
-}
-
 // 点列のクイックソート．
 void quickSort(int l, int r, tmp_point* point[])
 // int l, r; ソート範囲の左側と右側のインデックス．

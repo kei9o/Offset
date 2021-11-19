@@ -92,6 +92,12 @@ void keyboard(unsigned char key, int x, int y)
 		display_mode = DISPLAY_MODEL;
 		glutPostRedisplay();
 		break;
+		// STLモデルの表示．
+	case 'd':
+	case 'D':
+		display_mode = DISPLAY_MODEL;
+		glutPostRedisplay();
+		break;
 	default:
 		break;
 	}
@@ -109,6 +115,40 @@ void initGL(void)
 	glCullFace(GL_BACK); // 裏面は無視．
 }
 
+void resize(int width, int height) // 新しいサイズを取得し記録する
+{
+	// ウインドウサイズの取得
+	window_width = width;
+	window_height = height;
+}
+
+// マウスのボタン処理
+void mouse_button(int button, int state, int x, int y)
+{
+	if ((state == GLUT_DOWN) && (button == GLUT_LEFT_BUTTON))
+		motion_p = true;
+	else if (state == GLUT_UP)
+		motion_p = false;
+	mouse_old_x = x;
+	mouse_old_y = y;
+}
+
+// マウスの移動処理
+void mouse_motion(int x, int y)
+{
+	int dx, dy;
+	dx = x - mouse_old_x;
+	dy = y - mouse_old_y;
+	if (motion_p)
+	{
+		phi -= dx * 0.2;
+		theta += dy * 0.2;
+	}
+	mouse_old_x = x;
+	mouse_old_y = y;
+	glutPostRedisplay(); // 画像の強制書き換え
+}
+
 int main(int argc, char* argv[])
 {
 	glutInitWindowPosition(INIT_X_POS, INIT_Y_POS);
@@ -118,9 +158,9 @@ int main(int argc, char* argv[])
 	glutCreateWindow("Offset");        // OpenGLによる表示用ウインドウの生成 引数は名前
 	glutDisplayFunc(display);         // 表示用コールバック関数の設定 
 	glutKeyboardFunc(keyboard);
-	/*glutReshapeFunc(resize);
+	glutReshapeFunc(resize);
 	glutMouseFunc(mouse_button);
-	glutMotionFunc(mouse_motion);*/
+	glutMotionFunc(mouse_motion);
 	initGL();
 	glutMainLoop();                   // イベントの発生を待ち続けるループ関数の一種 ユーザの強制終了まで待機し続ける
 
