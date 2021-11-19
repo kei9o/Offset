@@ -47,12 +47,15 @@ bool readASCIISTLFile(const char* STL_file)
 	while (fgets(line, 100, in) != NULL) {
 
 		// vertexが見つかるまで読みとばす
-		if (strstr(line, "vertex") != NULL) 
+		if (strstr(line, "vertex") == NULL) 
 			continue;
 
 		// 連続する3頂点を読み込みポリゴンを登録．
 		(void)sscanf(line, "%s %lf %lf %lf", dummy, &x, &y, &z); // TODO forで回せる？
 		tmp_pnt = (tmp_point*)malloc(sizeof(tmp_point));
+		if (tmp_pnt) {
+			std::cout << "tmp_pnt is NULL" << std::endl;
+		}
 		point_array[num_tmp_points] = tmp_pnt;
 		tmp_pnt->coord[X] = x;
 		tmp_pnt->coord[Y] = y;
@@ -110,7 +113,7 @@ bool readBinarySTLFile(const char* STL_file)
 		return false;
 	}
 	std::cout << "Trying binary STL file ... ";
-	while (fread(line, 1, 50, in) != 50) {
+	while (fread(line, 1, 50, in) == 50) {
 		coord = (float*)line;
 
 		// 連続する3頂点を読み込みポリゴンを登録．
@@ -160,21 +163,27 @@ int compare(tmp_point* point0, tmp_point* point1)
 
 	// Y座標値で比較．
 	else {
-		if (point0->coord[Y] > (point1->coord[Y] - (EPS)))
+		if (point0->coord[Y] < (point1->coord[Y] - (EPS)))
 			return -1;
-		else if (point0->coord[Y] < (point1->coord[Y] + (EPS)))
+		else if (point0->coord[Y] > (point1->coord[Y] + (EPS)))
 			return 1;
 
 		// Z座標値で比較．
 		else {
-			if (point0->coord[Z] > (point1->coord[Z] - (EPS)))
+			if (point0->coord[Z] < (point1->coord[Z] - (EPS)))
 				return -1;
-			else if (point0->coord[Z] < (point1->coord[Z] + (EPS)))
+			else if (point0->coord[Z] > (point1->coord[Z] + (EPS)))
 				return 1;
 			else
 				return 0; // 2点は同一とみなす．
 		}
 	}
+}
+
+// std::sort用double変数比較関数
+static bool IsGreater(double u, double v)
+{
+	return u > v;
 }
 
 // 点列のクイックソート．
